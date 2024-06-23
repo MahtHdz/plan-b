@@ -39,14 +39,15 @@ perform_backup() {
     local backup_type=$1
     local tar_options=$2
     local backup_dir=$3
-    local snapshot_file=$4
+    local backup_paths=$4
+    local snapshot_file=$5
     local filename="${backup_type}-${TODAY}.tar.gz"
     local filepath="${TMP_DIR}/${filename}"
 
     cat $BANNER_PATH > $LOG_FILE
     log "Starting ${backup_type} backup"
 
-    tar $tar_options -cvzf $filepath $DIRECTORIES_TO_BACKUP $snapshot_file >> $LOG_FILE 2>&1
+    tar $tar_options -cvzf $filepath $backup_paths $snapshot_file >> $LOG_FILE 2>&1
     if [ $? -eq 0 ]; then
         rclone copy $filepath onedrive:$backup_dir -P --stats 1s
         rm $filepath
@@ -58,27 +59,27 @@ perform_backup() {
 
 # Perform full backup
 full_backup() {
-    perform_backup "full" "-cvzf" $FULL_DIR ""
+    perform_backup "full" "-cvzf" $FULL_DIR "$DIRECTORIES_TO_BACKUP"
 }
 
 # Perform incremental backup
 incremental_backup() {
-    perform_backup "incremental" "--listed-incremental=$INCREMENTAL_DIR/snapshot.file -cvzf" $INCREMENTAL_DIR ""
+    perform_backup "incremental" "--listed-incremental=$INCREMENTAL_DIR/snapshot.file -cvzf" $INCREMENTAL_DIR "$DIRECTORIES_TO_BACKUP"
 }
 
 # Perform differential backup
 differential_backup() {
-    perform_backup "differential" "--listed-incremental=$DIFFERENTIAL_DIR/snapshot.file -cvzf" $DIFFERENTIAL_DIR ""
+    perform_backup "differential" "--listed-incremental=$DIFFERENTIAL_DIR/snapshot.file -cvzf" $DIFFERENTIAL_DIR "$DIRECTORIES_TO_BACKUP"
 }
 
 # Perform OS recovery backup
 os_recovery_backup() {
-    perform_backup "os_recovery" "-cvzf" $OS_RECOVERY_DIR ""
+    perform_backup "os_recovery" "-cvzf" $OS_RECOVERY_DIR "$OS_DIRECTORIES_TO_BACKUP"
 }
 
 # Perform rollback backup (before major changes)
 rollback_backup() {
-    perform_backup "rollback" "-cvzf" $ROLLBACK_DIR ""
+    perform_backup "rollback" "-cvzf" $ROLLBACK_DIR "$DIRECTORIES_TO_BACKUP $OS_DIRECTORIES_TO_BACKUP"
 }
 
 # Restore from backup
