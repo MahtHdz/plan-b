@@ -25,9 +25,6 @@ DIRECTORIES_TO_BACKUP="/etc /home /opt /root /usr/local /var/lib /var/www"
 # OS recovery directories
 OS_DIRECTORIES_TO_BACKUP="/boot /boot/efi /bin /sbin /etc /lib /lib64 /usr /var"
 
-# Ensure backup directories exist
-mkdir -p $INCREMENTAL_DIR $DIFFERENTIAL_DIR $FULL_DIR $OS_RECOVERY_DIR $ROLLBACK_DIR
-
 # Logging function
 log() {
     echo "$(date +'%Y-%m-%d %H:%M:%S') - $1" >> $LOG_FILE
