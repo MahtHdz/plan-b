@@ -51,7 +51,7 @@ perform_backup() {
     fi
 
     if [ $? -eq 0 ]; then
-        rclone copy $filepath onedrive:$backup_dir -P --stats 1s
+        rclone copy $filepath ${REMOTE_NAME}:${backup_dir} -P --stats 1s
         rm $filepath
         log "${backup_type} backup completed"
     else
@@ -128,7 +128,7 @@ main() {
     esac
 
     log "Backup script completed"
-    rclone copy $LOG_FILE onedrive:$BACKUP_DIR/logs -P --stats 1s
+    rclone copy $LOG_FILE ${REMOTE_NAME}:${BACKUP_DIR}/logs -P --stats 1s
     rm $LOG_FILE
 }
 
